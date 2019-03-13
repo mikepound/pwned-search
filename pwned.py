@@ -18,7 +18,8 @@ def lookup_pwned_api(pwd):
 
 
 def main(args):
-    for pwd in args:
+    for pwd in args or sys.stdin:
+        pwd = pwd.strip()
         api_return = lookup_pwned_api(pwd)
         if (api_return):
             print(pwd, "was found")
