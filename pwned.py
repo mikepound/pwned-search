@@ -8,11 +8,14 @@ def lookup_pwned_api(pwd):
     head = sha1pwd[:5]
     tail = sha1pwd[5:]
 
-    r = requests.get('https://api.pwnedpasswords.com/range/{0}'.format(head))
-    if r.status_code == 200:
-        hashes = (s.split(':') for s in r.text.split('\r\n'))
-        pred = ((head + t,count) for t,count in hashes if t == tail)
+    url = 'https://api.pwnedpasswords.com/range/' + head
+    res = requests.get(url)
+    if res.status_code != 200:
+        raise RuntimeError('Error fetching "{}": {}'.format(
+            url, res.status_code))
 
+    hashes = (s.split(':') for s in r.text.split('\r\n'))
+    pred = ((head + t,count) for t,count in hashes if t == tail)
     password_hit = next(pred, None)
     return password_hit
 
