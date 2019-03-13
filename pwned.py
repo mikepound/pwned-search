@@ -24,12 +24,24 @@ def lookup_pwned_api(pwd):
     password_hit = next(pred, None)
     return password_hit
 
-
-api_return = lookup_pwned_api(sys.argv[1])
-if (api_return):
-    print (sys.argv[1], "was found")
-    print ("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
+#build a list of passwords to check
+password_list = []
+if (sys.argv[1] == '-'):
+    #read from stdin
+    for line in sys.stdin:
+        password_list.append(line.rstrip())
 else:
-    print (sys.argv[1], "was not found")
+    #read from argv
+    password_list.append(sys.argv[1])
+
+#do the lookup and analysis
+for password in password_list:
+    api_return = lookup_pwned_api(password)
+    
+    if (api_return):
+        print (password, "was found")
+        print ("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
+    else:
+        print (password, "was not found")
 
 exit()
