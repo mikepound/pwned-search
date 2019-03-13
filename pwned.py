@@ -1,35 +1,48 @@
+import hashlib
 import requests
-import cryptography
-from base64 import b16encode
 import sys
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
 
-def hash_password_sha1_hex(pwd):
-    digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
-    digest.update(pwd.encode('ASCII'))
-    sha1 = b16encode(digest.finalize()).decode('ASCII')
-    return sha1
 
 def lookup_pwned_api(pwd):
-    sha1pwd = hash_password_sha1_hex(pwd)
-    head = sha1pwd[:5]
-    tail = sha1pwd[5:]
+    """Returns hash and number of times password was seen in pwned database.
 
-    r = requests.get('https://api.pwnedpasswords.com/range/{0}'.format(head))
-    if r.status_code == 200:
-        hashes = (s.split(':') for s in r.text.split('\r\n'))
-        pred = ((head + t,count) for t,count in hashes if t == tail)
+    Args:
+        pwd: password to check
 
-    password_hit = next(pred, None)
-    return password_hit
+    Returns:
+        A (sha1, count) tuple where sha1 is SHA1 hash of pwd and count is number
+        of times the password was seen in the pwned database.  count equal zero
+        indicates that password has not been found.
+
+    Raises:
+        RuntimeError: if there was an error trying to fetch data from pwned
+            database.
+    """
+    sha1pwd = hashlib.sha1(pwd.encode('ascii')).hexdigest().upper()
+    head, tail = sha1pwd[:5], sha1pwd[5:]
+    url = 'https://api.pwnedpasswords.com/range/' + head
+    res = requests.get(url)
+    if res.status_code != 200:
+        raise RuntimeError('Error fetching "{}": {}'.format(
+            url, res.status_code))
+    hashes = (line.split(':') for line in res.text.splitlines())
+    count = next((int(count) for t, count in hashes if t == tail), 0)
+    return sha1pwd, count
 
 
-api_return = lookup_pwned_api(sys.argv[1])
-if (api_return):
-    print (sys.argv[1], "was found")
-    print ("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
-else:
-    print (sys.argv[1], "was not found")
+def main(args):
+    ec = 0
+    for pwd in args or sys.stdin:
+        pwd = pwd.strip()
+        sha1pwd, count = lookup_pwned_api(pwd)
+        if count:
+            print(pwd, "was found")
+            print("Hash {0}, {1} occurrences".format(sha1pwd, count))
+            ec = 1
+        else:
+            print(pwd, "was not found")
+    return ec
 
-exit()
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
