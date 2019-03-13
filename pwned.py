@@ -34,12 +34,18 @@ def main(args):
     ec = 0
     for pwd in args or sys.stdin:
         pwd = pwd.strip()
-        sha1pwd, count = lookup_pwned_api(pwd)
-        if count:
-            print("{0} was found with {1} occurrences (hash: {2})".format(pwd, count, sha1pwd))
+        try:
+            sha1pwd, count = lookup_pwned_api(pwd)
+
+            if count:
+                print("{0} was found with {1} occurrences (hash: {2})".format(pwd, count, sha1pwd))
+                ec = 1
+            else:
+                print(pwd, "was not found")
+        except:
+            print(pwd, "could not be checked: ", sys.exc_info()[1])
             ec = 1
-        else:
-            print(pwd, "was not found")
+            continue
     return ec
 
 
