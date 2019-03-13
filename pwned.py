@@ -18,12 +18,14 @@ def lookup_pwned_api(pwd):
 
 
 def main(args):
-    api_return = lookup_pwned_api(args[0])
-    if api_return:
-        print(args[0], "was found")
-        print("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
-    else:
-        print(args[0], "was not found")
+    for pwd in args:
+        api_return = lookup_pwned_api(pwd)
+        if (api_return):
+            print(pwd, "was found")
+            print("Hash {0}, {1} occurences".format(
+                api_return[0], api_return[1]))
+        else:
+            print(pwd, "was not found")
 
 
 if __name__ == '__main__':
