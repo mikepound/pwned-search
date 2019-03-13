@@ -17,11 +17,14 @@ def lookup_pwned_api(pwd):
     return password_hit
 
 
-api_return = lookup_pwned_api(sys.argv[1])
-if (api_return):
-    print (sys.argv[1], "was found")
-    print ("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
-else:
-    print (sys.argv[1], "was not found")
+def main(args):
+    api_return = lookup_pwned_api(args[0])
+    if api_return:
+        print(args[0], "was found")
+        print("Hash {0}, {1} occurences".format(api_return[0], api_return[1]))
+    else:
+        print(args[0], "was not found")
 
-exit()
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
