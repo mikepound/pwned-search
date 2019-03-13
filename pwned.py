@@ -18,6 +18,7 @@ def lookup_pwned_api(pwd):
 
 
 def main(args):
+    ec = 0
     for pwd in args or sys.stdin:
         pwd = pwd.strip()
         api_return = lookup_pwned_api(pwd)
@@ -25,9 +26,11 @@ def main(args):
             print(pwd, "was found")
             print("Hash {0}, {1} occurences".format(
                 api_return[0], api_return[1]))
+            ec = 1
         else:
             print(pwd, "was not found")
+    return ec
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    sys.exit(main(sys.argv[1:]))
