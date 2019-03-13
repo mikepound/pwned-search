@@ -1,18 +1,10 @@
+import hashlib
 import requests
-import cryptography
-from base64 import b16encode
 import sys
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
 
-def hash_password_sha1_hex(pwd):
-    digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
-    digest.update(pwd.encode('ASCII'))
-    sha1 = b16encode(digest.finalize()).decode('ASCII')
-    return sha1
 
 def lookup_pwned_api(pwd):
-    sha1pwd = hash_password_sha1_hex(pwd)
+    sha1pwd = hashlib.sha1(pwd.encode('ascii')).hexdigest().upper()
     head = sha1pwd[:5]
     tail = sha1pwd[5:]
 
