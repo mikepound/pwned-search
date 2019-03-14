@@ -1,6 +1,11 @@
 # pwned-search
 Pwned Password API lookup
 
+
+- Required libaries:
+
+* requests: `pip install requests`
+
 Usage:
 
 * `python pwned.py` – reads passwords from standard input;
