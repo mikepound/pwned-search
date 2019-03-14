@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import hashlib
 import sys
 
@@ -15,7 +16,7 @@ def lookup_pwned_api(pwd):
         pwd: password to check
 
     Returns:
-        A (sha1, count) tuple where sha1 is SHA1 hash of pwd and count is number
+        A (sha1, count) tuple where sha1 is SHA-1 hash of pwd and count is number
         of times the password was seen in the pwned database.  count equal zero
         indicates that password has not been found.
 
