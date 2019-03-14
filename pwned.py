@@ -19,7 +19,7 @@ def lookup_pwned_api(pwd):
             database.
         UnicodeError: if there was an error UTF_encoding the password.
     """
-    sha1pwd = hashlib.sha1(pwd.encode('ascii')).hexdigest().upper()
+    sha1pwd = hashlib.sha1(pwd.encode('UTF-8')).hexdigest().upper()
     head, tail = sha1pwd[:5], sha1pwd[5:]
     url = 'https://api.pwnedpasswords.com/range/' + head
     res = requests.get(url)
