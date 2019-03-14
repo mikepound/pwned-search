@@ -1,6 +1,11 @@
 import hashlib
-import requests
 import sys
+
+try:
+    import requests
+except ModuleNotFoundError:
+    print("###  pip install requests  ###")
+    raise
 
 
 def lookup_pwned_api(pwd):
@@ -18,7 +23,7 @@ def lookup_pwned_api(pwd):
         RuntimeError: if there was an error trying to fetch data from pwned
             database.
     """
-    sha1pwd = hashlib.sha1(pwd.encode('ascii')).hexdigest().upper()
+    sha1pwd = hashlib.sha1(pwd.encode('utf-8')).hexdigest().upper()
     head, tail = sha1pwd[:5], sha1pwd[5:]
     url = 'https://api.pwnedpasswords.com/range/' + head
     res = requests.get(url)
