@@ -36,11 +36,11 @@ def main(args):
         pwd = pwd.strip()
         sha1pwd, count = lookup_pwned_api(pwd)
         if count:
-            print(pwd, "was found")
+            print("{} was found".format(pwd))
             print("Hash {0}, {1} occurrences".format(sha1pwd, count))
             ec = 1
         else:
-            print(pwd, "was not found")
+            print("{} was not found".format(pwd))
     return ec
 
 
