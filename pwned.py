@@ -22,6 +22,7 @@ def lookup_pwned_api(pwd):
     Raises:
         RuntimeError: if there was an error trying to fetch data from pwned
             database.
+        UnicodeError: if there was an error UTF_encoding the password.
     """
     sha1pwd = hashlib.sha1(pwd.encode('utf-8')).hexdigest().upper()
     head, tail = sha1pwd[:5], sha1pwd[5:]
@@ -39,13 +40,20 @@ def main(args):
     ec = 0
     for pwd in args or sys.stdin:
         pwd = pwd.strip()
-        sha1pwd, count = lookup_pwned_api(pwd)
-        if count:
-            print("{} was found".format(pwd))
-            print("Hash {0}, {1} occurrences".format(sha1pwd, count))
+        try:
+            sha1pwd, count = lookup_pwned_api(pwd)
+
+            if count:
+                foundmsg = "{0} was found with {1} occurrences (hash: {2})"
+                print(foundmsg.format(pwd, count, sha1pwd))
+                ec = 1
+            else:
+                print("{} was not found".format(pwd))
+        except UnicodeError:
+            errormsg = sys.exc_info()[1]
+            print("{0} could not be checked: {1}".format(pwd, errormsg))
             ec = 1
-        else:
-            print("{} was not found".format(pwd))
+            continue
     return ec
 
 
