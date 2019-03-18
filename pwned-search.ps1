@@ -1,4 +1,4 @@
-﻿$string = Read-Host -Prompt 'Password to check'
+$string = Read-Host -Prompt 'Password to check'
 $bytes = [System.Text.Encoding]::UTF8.GetBytes($string)
 $sha1 = New-Object System.Security.Cryptography.SHA1CryptoServiceProvider
 $data = $sha1.ComputeHash($bytes)
@@ -20,3 +20,5 @@ while (($line = $reader.ReadLine()) -ne $null) {
     }
 }
 if ($found -eq 0) { Write-Host "That password was not found." }
+
+Read-Host -Prompt "Press Enter to exit"
