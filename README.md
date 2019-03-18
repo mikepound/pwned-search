@@ -1,7 +1,7 @@
 # pwned-search
 Pwned Password API lookup
 
-- Required libaries:
+- Required libraries:
 
 * requests: `pip install requests`
 
@@ -14,7 +14,7 @@ Usage:
   passwords written to standard output by another command;
 * `python pwned.py [password]` – checks passwords given as command line
   arguments (beware the password may be saved in shell history and that
-  other users on the system ma be able to observe the command line).
+  other users on the system may be able to observe the command line).
 
 Thanks to those who fixed my dodgy code :)
 
