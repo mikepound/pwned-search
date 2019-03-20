@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!-- FYI must be serverd via HTTPS to function properly -->
+<html>
+<head>
+<meta charset='UTF-8'/>
+  <title>Pwned Password API lookup.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0">  
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  
+  html, body {
+   background-color:lightblue;
+   cursor:pointer;
+   height:100%;
+   width:100%;
+   padding:0;
+   margin:0;
+  }
+  
+  b {
+   color : red;
+  }
+  
+  #bodyDiv {
+    border:2px solid blue;
+    border-radius:7px;
+    height:150px;
+    width:600px;
+    margin:80px;
+    padding:25px;
+    background-color:darkgrey;
+    color:black;
+  }
+  
+   @media only screen and (max-width : 700px) {
+    
+   #bodyDiv {
+    border:2px solid blue;
+    border-radius:7px;
+    width:100%;
+    height:80%;
+    margin:0;
+    padding:25px;
+    background-color:darkgrey;
+    color:black;
+  }
+    
+   #hash {
+     font-size:10px;
+   } 
+    
+   }
+  
+</style>
+</head>
+<body>
+<div id="bodyDiv">
+<span title="Password does not leave the browser, but it will show on the screen.">?</span>
+<input id="inPut" type="text" placeholder="Password...">
+<button title="Click to send part of hashed password.">Check</button>
+<div>
+  <p id="outPut"></p>
+</div>
+
+</div>
+<a href="https://github.com/mikepound/pwned-search">The inspiration!</a>
+  <script>
+let first = "";
+let last = "";
+let hash = "";
+function hexString(buffer) {
+  // creates an array of 8-bit unsigned integers
+  const byteArray = new Uint8Array(buffer);
+  // turns that hash into hex
+  const hexCodes = [...byteArray].map(value => {
+    // eash element in array is converted to base 16 string
+    const hexCode = value.toString(16);
+    // pad beggining with 0  why?
+    const paddedHexCode = hexCode.padStart(2, '0');
+    // return upper case hex hash
+    return paddedHexCode.toUpperCase();
+  });
+  // return a string not an array
+  return hexCodes.join('');
+}
+
+function digestMessage(message) {
+   // Returns a newly constructed TextEncoder that will generate a byte stream with utf-8 encoding.
+  const encoder = new TextEncoder(); 
+   // Takes a USVString as input, and returns a Uint8Array containing utf-8 encoded text.
+  const data = encoder.encode(message);
+   // returns the hash
+   //The digest() method of the SubtleCrypto interface generates a digest of the given data. 
+   // A digest is a short fixed-length value derived from some variable-length input.
+  return window.crypto.subtle.digest('SHA-1', data);
+}
+
+function runCheck() {
+let outPut = document.getElementById("outPut");
+let inPut = document.getElementById("inPut");
+let text = inPut.value;
+if (text === "") return false;
+inPut.value = "";
+
+  
+digestMessage(text).then(digestValue => {
+  hash = hexString(digestValue);
+  first = hash.substring(0, 5);
+  last = hash.substring(5);
+  fetch('https://api.pwnedpasswords.com/range/' + first)
+  .then(
+    function(response) {
+      if (response.status !== 200) {
+        console.log('Looks like there was a problem. Status Code: ' +
+          response.status);
+        return;
+      }
+    return response.text();
+  })
+  .then(function(text) {
+    return text.split("\r\n");  
+  })
+  .then(function(arr){
+   
+     document.getElementById("outPut")
+          .innerHTML = "The password : " + text + 
+          "SHA1 Hash : " + hash + 
+          "<br>Was not found!";
+   
+     arr.forEach((s)=>{
+      
+       let a = s.split(":");
+       
+       if(a[0] == last) {
+        
+        document.getElementById("outPut")
+           .innerHTML = "The password : " + text + 
+           "<br>SHA1 Hash : <span id='hash'>" + hash + 
+           "</span><br>Was found <b>" + a[1] + "</b> times!";
+           
+        return true;
+        
+       }
+      
+     });
+     
+  })
+  .catch(function(error) {
+    log('Request failed', error)
+  });
+
+});
+  
+outPut.value = "";
+  
+}
+
+document.querySelector("button")
+        .addEventListener("click", runCheck);
+
+  </script>
+</body>
+</html>
+
