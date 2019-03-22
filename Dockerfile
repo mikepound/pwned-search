@@ -2,6 +2,6 @@ FROM python:3
 
 RUN pip install requests
 
-ADD . /app/pwned.py
+ADD . /app
 
 ENTRYPOINT [ "python", "/app/pwned.py" ]
