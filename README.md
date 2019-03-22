@@ -16,6 +16,10 @@ Usage:
   arguments (beware the password may be saved in shell history and that
   other users on the system may be able to observe the command line).
 
+Using Docker:
+* `docker build -t pwned .` Builds docker image
+* `docker run --rm pwned [password]` Runs the pwned command pre-installed in a docker container
+
 Thanks to those who fixed my dodgy code :)
 
 Have fun! Oh, and if you find one of your own passwords, change it asap!
