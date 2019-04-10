@@ -20,4 +20,5 @@ while ($null -ne ($line = $reader.ReadLine())) {
 }
 if ($found -eq 0) { Write-Host "That password was not found." }
 
+$reader.Close()
 Read-Host -Prompt "Press Enter to exit"
