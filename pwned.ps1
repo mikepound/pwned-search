@@ -11,7 +11,7 @@ $request = [System.Net.WebRequest]::Create("https://api.pwnedpasswords.com/range
 $reader = New-Object System.IO.StreamReader(($request.GetResponse()).GetResponseStream())
 
 $found = 0
-while (($line = $reader.ReadLine()) -ne $null) {
+while ($null -ne ($line = $reader.ReadLine())) {
     if (($split = $line.Split(':'))[0] -eq $tail) {
         Write-Host "That password has been compromised. Occurrences:" $split[1]
         $found = 1
