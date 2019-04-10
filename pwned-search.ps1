@@ -13,8 +13,8 @@ $reader = New-Object System.IO.StreamReader(($request.GetResponse()).GetResponse
 
 $found = 0
 while (($line = $reader.ReadLine()) -ne $null) {
-    if ($line.Split(':')[0] -eq $tail) {
-        Write-Host "That password has been compromised."
+    if (($split = $line.Split(':'))[0] -eq $tail) {
+        Write-Host "That password has been compromised. Occurrences:" $split[1]
         $found = 1
         break
     }
