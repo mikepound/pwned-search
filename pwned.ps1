@@ -3,7 +3,6 @@ $bytes = [System.Text.Encoding]::UTF8.GetBytes($string)
 $sha1 = New-Object System.Security.Cryptography.SHA1CryptoServiceProvider
 $data = $sha1.ComputeHash($bytes)
 $result = ($data | ForEach-Object ToString X2) -join ''
-$result = $result.ToUpper()
 $head = $result.Substring(0,5)
 $tail = $result.Substring(5)
 
