@@ -29,7 +29,7 @@ def lookup_pwned_api(pwd):
     head, tail = sha1pwd[:5], sha1pwd[5:]
     url = 'https://api.pwnedpasswords.com/range/' + head
     res = requests.get(url)
-    if res.status_code != 200:
+    if not res.ok:
         raise RuntimeError('Error fetching "{}": {}'.format(
             url, res.status_code))
     hashes = (line.split(':') for line in res.text.splitlines())
