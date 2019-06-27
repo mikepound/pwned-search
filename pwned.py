@@ -45,14 +45,14 @@ def main(args):
             sha1pwd, count = lookup_pwned_api(pwd)
 
             if count:
-                foundmsg = "{0} was found with {1} occurrences (hash: {2})"
+                foundmsg = "{} was found with {} occurrences (hash: {})"
                 print(foundmsg.format(pwd, count, sha1pwd))
                 ec = 1
             else:
                 print("{} was not found".format(pwd))
         except UnicodeError:
             errormsg = sys.exc_info()[1]
-            print("{0} could not be checked: {1}".format(pwd, errormsg))
+            print("{} could not be checked: {}".format(pwd, errormsg))
             ec = 1
             continue
     return ec
