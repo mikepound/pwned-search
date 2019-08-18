@@ -39,7 +39,12 @@ main = do
 
   -- search for the hash and save it together with it's count
   let lines = splitOn "\r\n" textFromBody
-  let ourHash = head [hash | hash <- lines, head (splitOn ":" hash) == lfive]
+  let hashes = [hash | hash <- lines, head (splitOn ":" hash) == lfive]
 
-  -- finally tell the user how many times his password has been seen, and also the hash of his password
-  putStrLn $ "Your password has the hash: " ++ (show $ (splitOn ":" ourHash) !! 0) ++ "and has been seen " ++ (show $ (splitOn ":" ourHash) !! 1) ++ " times before!"
+  -- check if the hash was found and give a response to the user
+  if null hashes == True
+    then putStrLn $ "Your password has the hash: " ++ hashedPassword ++ " and hasn't been seen before!"
+    else do
+    let ourHash = head hashes
+    let noA = read ((splitOn ":" ourHash) !! 1) :: Integer
+    putStrLn $ "Your password has the hash: " ++ hashedPassword ++ " and has been seen " ++ show noA  ++ " times before!"
