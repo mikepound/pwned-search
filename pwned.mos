@@ -15,12 +15,12 @@ PWNAPI="https://api.pwnedpasswords.com/range"
 lookup_pwned_api() {
 	local pass="$1"
 	local pwhash=$(printf "%s" "$pass" | shasum -a 1 | cut -d" " -f1)
-	local curlrv="$(curl -s "$PWNAPI"/"${pwhash:0:5}")"
+	local curlrv=$(curl -s "$PWNAPI/${pwhash:0:5}")
 	[ -z "$curlrv" ] && echo "$pass could not be checked" && return
-	local result="$(echo "$curlrv" | grep -i "${pwhash:5:35}")"
+	local result=$(echo "$curlrv" | grep -i "${pwhash:5:35}")
 
 	if [ -n "$result" ]; then
-		local occ="$(printf "%s" "${result}" | cut -d: -f2 | sed 's/[^0-9]*//g')"
+		local occ=$(printf "%s" "${result}" | cut -d: -f2 | sed 's/[^0-9]*//g')
 		printf "%s was found with %s occurances (hash: %s)\n" "$pass" "$occ" "$pwhash"
 	else
 		printf "%s was not found\n" "$pass"
@@ -28,14 +28,14 @@ lookup_pwned_api() {
 }
 
 if [ "$#" -lt 1 ]; then
-	# read from file or stdin
-	while read -r pw; do
-		lookup_pwned_api $pw
+	# read from file or stdin (one password per line)
+	while IFS=$'\r\n' read -r pw; do
+		lookup_pwned_api "$pw"
 	done
 else
 	# read arguments
 	for pw in "$@"; do
-		lookup_pwned_api $pw
+		lookup_pwned_api "$pw"
 	done
 fi
 
