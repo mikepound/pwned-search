@@ -24,7 +24,7 @@ foreach($res as $v)
     $c = explode(':', $v);
     
     //Checks if any of the hashes' last 5 characters matches the tail variable
-    if(substr($c[0], -5) == $tail)
+    if(strpos($c[0], $tail) !== false)
     {
 
         //Returns the amount of times the password appears in the pwnd api
