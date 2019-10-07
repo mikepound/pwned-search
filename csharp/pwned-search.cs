@@ -7,13 +7,13 @@ using System.IO;
 namespace pwned_search {
     class Program {
         static void Main(string[] args) {
-            Console.InputEncoding = Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
 
             Console.Write("Enter the password to check: ");
             string plaintext = Console.ReadLine();
 
             SHA1 sha = new SHA1CryptoServiceProvider();
-            byte[] data = sha.ComputeHash(Encoding.Unicode.GetBytes(plaintext));
+            byte[] data = sha.ComputeHash(Encoding.UTF8.GetBytes(plaintext));
 
             // Loop through each byte of the hashed data 
             // and format each one as a hexadecimal string.
