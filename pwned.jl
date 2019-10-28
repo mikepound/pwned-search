@@ -64,7 +64,7 @@ if ARGS == []
         check_pwd(pwd)
     end
 else
-    @warn "Entering passwords in plain text on a terminal is a bad idea!i\nInstead run this program without any arguments, in which case it reads from stdin and no histry will be created.\nIt is highly recommended to clear your terminal's history after using this program!"
+    @warn "Entering passwords in plain text on a terminal is a bad idea!i\nInstead run this program without any arguments,\nin which case it reads from stdin and no history will be created.\nIt is highly recommended to clear your terminal's history after using this program!"
     for pwd in ARGS
         check_pwd(pwd)
     end
