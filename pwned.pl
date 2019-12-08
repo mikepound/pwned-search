@@ -73,6 +73,10 @@ sub lookup_password
 
 sub main
 {
+    unless ((scalar @ARGV) > 0)
+    {
+        print "usage: pwned.pl <password0> <password1> <...> <passwordN>\n";
+    }
     for my $password (@ARGV)
     {
         my ($hash, $count) = lookup_password($password);
