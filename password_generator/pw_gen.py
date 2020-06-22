@@ -1,3 +1,9 @@
+"""
+This software helps automate a more secure password given a set of criteria,
+    e.g. include lower vs upper-case letters, digits, symbols, etc. with given length
+"""
+
+
 import argparse
 import sys
 import string
