@@ -61,27 +61,27 @@ def get_password(length, include_lowercase, include_uppercase, include_number, i
     for i in range(length):
 
         if include_lowercase and not add_lowercase:
-            random_index = random.randint(0, len(lower_cases))
+            random_index = random.randint(0, len(lower_cases) - 1)
             pw += lower_cases[random_index]
             add_lowercase = True
 
         elif include_uppercase and not add_uppercase:
-            random_index = random.randint(0, len(upper_cases))
+            random_index = random.randint(0, len(upper_cases) - 1)
             pw += upper_cases[random_index]
             add_uppercase = True
 
         elif include_number and not add_number:
-            random_index = random.randint(0, len(digits))
+            random_index = random.randint(0, len(digits) - 1)
             pw += digits[random_index]
             add_number = True
 
         elif include_symbols and not add_symbols:
-            random_index = random.randint(0, len(symbols))
+            random_index = random.randint(0, len(symbols) - 1)
             pw += symbols[random_index]
             add_symbols = True
 
         else:
-            random_index = random.randint(0, len(all_chars))
+            random_index = random.randint(0, len(all_chars) - 1)
             pw += all_chars[random_index]
 
     random.shuffle(pw)
