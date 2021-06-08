@@ -4,8 +4,10 @@ import sys
 
 try:
     import requests
+    from getpass import getpass
 except ModuleNotFoundError:
     print("###  pip install requests  ###")
+    print("###  pip install getpass  ###")
     raise
 
 
@@ -39,24 +41,26 @@ def lookup_pwned_api(pwd):
 
 def main(args):
     ec = 0
-    for pwd in args or sys.stdin:
-        pwd = pwd.strip()
-        try:
-            sha1pwd, count = lookup_pwned_api(pwd)
-        except UnicodeError:
-            errormsg = sys.exc_info()[1]
-            print("{0} could not be checked: {1}".format(pwd, errormsg))
-            ec = 1
-            continue
+    
+    pwd = args
+    try:
+        sha1pwd, count = lookup_pwned_api(pwd)
+    except UnicodeError:
+        errormsg = sys.exc_info()[1]
+        print("{0} could not be checked: {1}".format(pwd, errormsg))
+        ec = 1
+       
 
-        if count:
-            foundmsg = "{0} was found with {1} occurrences (hash: {2})"
-            print(foundmsg.format(pwd, count, sha1pwd))
-            ec = 1
-        else:
-            print("{} was not found".format(pwd))
+    if count:
+        foundmsg = "{0} was found with {1} occurrences (hash: {2})"
+        print(foundmsg.format(pwd, count, sha1pwd))
+        ec = 1
+    else:
+        print("{} was not found".format(pwd))
     return ec
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    while(1):
+        pw = getpass('Enter Password: ')
+        main(pw)
