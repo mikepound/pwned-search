@@ -1,97 +1,59 @@
-"""
-This software helps automate a more secure password given a set of criteria,
-    e.g. include lower vs upper-case letters, digits, symbols, etc. with given length
-"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+"""
+This software helps creating a secure (hopefully unpredictable and not findable in dictionaries) password
+given a set of characters to compose the password and a desired password length
+
+e.g. include lowercase, uppercase, digits, punctuation etc. with given length 32
+"""
 
 import argparse
-import sys
 import string
-import random
+import secrets
+from typing import Union
 
-symbols = list('`~!@#$%^&*()-=_+[]{}|\\;\',./<>?')
-lower_cases = list(string.ascii_lowercase)
-upper_cases = list(string.ascii_uppercase)
-digits = list(string.digits)
-
-
-def validate_password_requirements(length, include_lowercase, include_uppercase, include_number, include_symbols):
-    minimum_length = 0
-
-    if include_lowercase:
-        minimum_length += 1
-
-    if include_uppercase:
-        minimum_length += 1
-
-    if include_number:
-        minimum_length += 1
-
-    if include_symbols:
-        minimum_length += 1
-
-    return length >= minimum_length
+DEFAULT_PASSWORD_CHARS = string.ascii_letters + string.digits + string.punctuation
+LOWERCASE = string.ascii_lowercase
+UPPERCASE = string.ascii_uppercase
+DIGITS = string.digits
+PUNCTUATION = string.punctuation
 
 
-def get_character_space(include_lowercase, include_uppercase, include_number, include_symbols):
-    all_chars = []
+def generate_random_password(pw_length: int = 40, pw_char_set: Union[str, list] = DEFAULT_PASSWORD_CHARS) -> str:
+    """ create random password """
 
-    if include_lowercase:
-        all_chars += lower_cases
+    if not isinstance(pw_length, int) or not hasattr(pw_char_set, '__iter__'):
+        raise TypeError('invalid type of pw length or pw char set')
 
-    if include_uppercase:
-        all_chars += upper_cases
+    if pw_length < 1 or len(pw_char_set) < 1 or False in [isinstance(char, str) for char in pw_char_set]:
+        raise ValueError('invalid values for create_random_password')
 
-    if include_number:
-        all_chars += digits
-
-    if include_symbols:
-        all_chars += symbols
-
-    return all_chars
+    return ''.join(secrets.SystemRandom(None).choice(pw_char_set) for _ in range(pw_length))
 
 
-def get_password(length, include_lowercase, include_uppercase, include_number, include_symbols):
-    pw = []
-    add_lowercase = add_uppercase = add_number = add_symbols = False
-    all_chars = get_character_space(include_lowercase, include_uppercase, include_number, include_symbols)
+def password_is_compose_of_all_selected_charsets(use_lower: bool, use_upper: bool, use_digit: bool,
+                                                 use_punctuation: bool, password: str) -> bool:
+    """ this function checks weather all selected charsets are used to compose the password """
 
-    random.shuffle(all_chars)
+    if use_lower and True not in [char in LOWERCASE for char in password]:
+        return False
 
-    for i in range(length):
+    if use_upper and True not in [char in UPPERCASE for char in password]:
+        return False
 
-        if include_lowercase and not add_lowercase:
-            random_index = random.randint(0, len(lower_cases))
-            pw += lower_cases[random_index]
-            add_lowercase = True
+    if use_digit and True not in [char in DIGITS for char in password]:
+        return False
 
-        elif include_uppercase and not add_uppercase:
-            random_index = random.randint(0, len(upper_cases))
-            pw += upper_cases[random_index]
-            add_uppercase = True
+    if use_punctuation and True not in [char in PUNCTUATION for char in password]:
+        return False
 
-        elif include_number and not add_number:
-            random_index = random.randint(0, len(digits))
-            pw += digits[random_index]
-            add_number = True
-
-        elif include_symbols and not add_symbols:
-            random_index = random.randint(0, len(symbols))
-            pw += symbols[random_index]
-            add_symbols = True
-
-        else:
-            random_index = random.randint(0, len(all_chars))
-            pw += all_chars[random_index]
-
-    random.shuffle(pw)
-
-    return ''.join(pw)
+    return True
 
 
-if __name__ == "__main__":
-
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate random password")
+
     parser.add_argument("--length", "-l", required=True, type=int, help="Length of password")
     parser.add_argument("--include_lowercase", "-lc", required=False, type=bool, default=True,
                         help="Include lowercase character in the password")
@@ -101,22 +63,23 @@ if __name__ == "__main__":
                         help="Include numeric character in the password")
     parser.add_argument("--include_symbol", "-s", required=False, type=bool, default=True,
                         help="Include special character in the password")
+
     args = parser.parse_args()
 
-    try:
-        pw_length = args.length
-        pw_lower = args.include_lowercase
-        pw_upper = args.include_uppercase
-        pw_digit = args.include_digit
-        pw_symbol = args.include_symbol
+    char_set_and_bool = [(LOWERCASE, args.include_lowercase), (UPPERCASE, args.include_uppercase),
+                         (DIGITS, args.include_digit), (PUNCTUATION, args.include_symbol)]
 
-        is_valid_pw = validate_password_requirements(pw_length, pw_lower, pw_upper, pw_digit, pw_symbol)
+    used_char_set = ''.join([char_set if condition else None for char_set, condition in char_set_and_bool])
 
-        if is_valid_pw:
-            password = get_password(pw_length, pw_lower, pw_upper, pw_digit, pw_symbol)
-            print(password)
-        else:
-            print('Password length is not valid per requirements')
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        raise
+    generated_password = generate_random_password(pw_length=args.length, pw_char_set=used_char_set)
+
+    if not password_is_compose_of_all_selected_charsets(
+            use_lower=args.include_lowercase, use_upper=args.include_uppercase, use_digit=args.include_digit,
+            use_punctuation=args.include_symbol, password=generated_password):
+        print('\033[5;31;40mWARNING:\033[0mthe password is not composed out of every selected charset\n')
+
+    print(f'generated password: \033[1;31;40m{generated_password}\033[0m')
+
+
+if __name__ == "__main__":
+    main()
