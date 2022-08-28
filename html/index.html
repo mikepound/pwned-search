@@ -1,166 +1,186 @@
 <!DOCTYPE html>
-<!-- FYI must be serverd via HTTPS to function properly -->
 <html>
-<head>
-<meta charset='UTF-8'/>
-  <title>Pwned Password API lookup.</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0">  
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  
-  html, body {
-   background-color:lightblue;
-   cursor:pointer;
-   height:100%;
-   width:100%;
-   padding:0;
-   margin:0;
-  }
-  
-  b {
-   color : red;
-  }
-  
-  #bodyDiv {
-    border:2px solid blue;
-    border-radius:7px;
-    height:150px;
-    width:600px;
-    margin:80px;
-    padding:25px;
-    background-color:darkgrey;
-    color:black;
-  }
-  
-   @media only screen and (max-width : 700px) {
-    
-   #bodyDiv {
-    border:2px solid blue;
-    border-radius:7px;
-    width:100%;
-    height:80%;
-    margin:0;
-    padding:25px;
-    background-color:darkgrey;
-    color:black;
-  }
-    
-   #hash {
-     font-size:10px;
-   } 
-    
-   }
-  
-</style>
-</head>
-<body>
-<div id="bodyDiv">
-<span title="Password does not leave the browser, but it will show on the screen.">?</span>
-<input id="inPut" type="text" placeholder="Password...">
-<button title="Click to send part of hashed password.">Check</button>
-<div>
-  <p id="outPut"></p>
-</div>
+  <head>
+    <meta charset='UTF-8'/>
+    <title>Pwned Password API lookup.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0">  
+    <link rel="stylesheet" href="./essential_bootstrap.css">
 
-</div>
-<a href="https://github.com/mikepound/pwned-search">The inspiration!</a>
-  <script>
-let first = "";
-let last = "";
-let hash = "";
-function hexString(buffer) {
-  // creates an array of 8-bit unsigned integers
-  const byteArray = new Uint8Array(buffer);
-  // turns that hash into hex
-  const hexCodes = [...byteArray].map(value => {
-    // eash element in array is converted to base 16 string
-    const hexCode = value.toString(16);
-    // pad beggining with 0  why?
-    const paddedHexCode = hexCode.padStart(2, '0');
-    // return upper case hex hash
-    return paddedHexCode.toUpperCase();
-  });
-  // return a string not an array
-  return hexCodes.join('');
-}
+    <style>
 
-function digestMessage(message) {
-   // Returns a newly constructed TextEncoder that will generate a byte stream with utf-8 encoding.
-  const encoder = new TextEncoder(); 
-   // Takes a USVString as input, and returns a Uint8Array containing utf-8 encoded text.
-  const data = encoder.encode(message);
-   // returns the hash
-   //The digest() method of the SubtleCrypto interface generates a digest of the given data. 
-   // A digest is a short fixed-length value derived from some variable-length input.
-  return window.crypto.subtle.digest('SHA-1', data);
-}
-
-function runCheck() {
-let outPut = document.getElementById("outPut");
-let inPut = document.getElementById("inPut");
-let text = inPut.value;
-if (text === "") return false;
-inPut.value = "";
-
-  
-digestMessage(text).then(digestValue => {
-  hash = hexString(digestValue);
-  first = hash.substring(0, 5);
-  last = hash.substring(5);
-  fetch('https://api.pwnedpasswords.com/range/' + first)
-  .then(
-    function(response) {
-      if (response.status !== 200) {
-        console.log('Looks like there was a problem. Status Code: ' +
-          response.status);
-        return;
+      
+      html, body {
+        background-color:lightblue;
+        height:100%;
+        width:100%;
+        padding:0;
+        margin:0;
       }
-    return response.text();
-  })
-  .then(function(text) {
-    return text.split("\r\n");  
-  })
-  .then(function(arr){
-   
-     document.getElementById("outPut")
-          .innerHTML = "The password : " + text + 
-          "SHA1 Hash : " + hash + 
-          "<br>Was not found!";
-   
-     arr.forEach((s)=>{
+
+      .source {
+        position: absolute;
+        margin: 15px;
+        margin-left: 0px;
+        bottom: 0;
+      }
       
-       let a = s.split(":");
-       
-       if(a[0] == last) {
-        
-        document.getElementById("outPut")
-           .innerHTML = "The password : " + text + 
-           "<br>SHA1 Hash : <span id='hash'>" + hash + 
-           "</span><br>Was found <b>" + a[1] + "</b> times!";
-           
-        return true;
-        
-       }
+      b {
+      color : red;
+      }
       
-     });
-     
-  })
-  .catch(function(error) {
-    log('Request failed', error)
-  });
+      .bodyDiv {
+        position: relative;
+        border-radius:7px;
+        height:300px;
+        width:600px;
+        min-width:245px;
+        margin:80px;
+        padding:25px;
+        background-color: white;
+      }
 
-});
-  
-outPut.value = "";
-  
-}
+      div {
+        margin-top: 10px;
+      }
+      
+      @media only screen and (max-width : 800px) {
+        
+        #hash {
+          font-size:10px;
+        }
 
-document.querySelector("button")
-        .addEventListener("click", runCheck);
+        .bodyDiv {
+          position: fixed;
+          top: 0;
+          right: 0;
+          left: 0;
+          width: auto;
+          margin: 10px;
+        }
+        
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="bodyDiv">
+      <p>Only the first five characters of the hash of your password get send to <a href="https://haveibeenpwned.com/API/v2#SearchingPwnedPasswordsByRange">haveibeenpwned.com</a></p>
+      <form class="form-inline" onsubmit="javascript:runCheck();return false;" >
+        <input id="input" class="form-control" type="text" placeholder="Password...">
+        <button title="Click to send part of hashed password." class="btn btn-success" type="submit">Check</button>
+      </form> 
+      <div><p id="output"></p></div>
 
-  </script>
-</body>
+      <a class="source" href="https://github.com/mikepound/pwned-search">Source code on github</a>
+    </div>
+    <script>
+
+  let first = "";
+  let last = "";
+  let hash = "";
+
+  function hexString(buffer) {
+    // creates an array of 8-bit unsigned integers
+    const byteArray = new Uint8Array(buffer);
+    // turns that hash into hex
+    const hexCodes = [...byteArray].map(value => {
+      // each element in array is converted to base 16 string
+      const hexCode = value.toString(16);
+      // pad beggining with 0  why?
+      const paddedHexCode = hexCode.padStart(2, '0');
+      // return upper case hex hash
+      return paddedHexCode.toUpperCase();
+    });
+    // return a string not an array
+    return hexCodes.join('');
+  }
+
+  async function digestMessage(message) {
+    // Returns a newly constructed TextEncoder that will generate a byte stream with utf-8 encoding.
+    const encoder = new TextEncoder(); 
+    // Takes a USVString as input, and returns a Uint8Array containing utf-8 encoded text.
+    const data = encoder.encode(message);
+
+    // returns the hash
+    // The digest() method of the SubtleCrypto interface generates a digest of the given data. 
+    // A digest is a short fixed-length value derived from some variable-length input.
+    return window.crypto.subtle.digest('SHA-1', data);
+  }
+
+  async function runCheck() {
+    
+    // get references to the dom
+    let output = document.getElementById("output");
+    let input = document.getElementById("input");
+
+    
+
+    try {
+      // extract input text from textbox
+      let text = input.value;
+      input.value = "";
+
+
+      if (text === "") {
+        throw "Textbox can't be empty";
+      }
+
+      // generate hash buffer
+      let digestValue = await digestMessage(text);
+
+      
+
+      // turn buffer into string
+      hash = hexString(digestValue);
+
+      // split hash into head and tail
+      first = hash.substring(0, 5);
+      last = hash.substring(5);
+      let response = await fetch('https://api.pwnedpasswords.com/range/' + first);
+
+      // get response text
+      let responseText = await response.text();
+
+      // split the response into an array with potential passwords
+      let arr = responseText.split("\r\n");  
+      
+      // if nothing was found this will be displayed
+      document.getElementById("output")
+            .innerHTML = "The password : " + text + 
+            "<br>SHA1 Hash : <span id='hash'>" + hash + 
+            "</span><br>Was not found!";
+
+      arr.forEach((s)=>{
+        
+        // split each line into the found hash and the amount of occurences
+        let a = s.split(":");
+        
+        // a[0] is the found hash
+        if(a[0] === last) {
+          
+          // set output text
+          document.getElementById("output")
+            .innerHTML = "The password : " + text + 
+            "<br>SHA1 Hash : <span id='hash'>" + hash + 
+            "</span><br>Was found <b>" + a[1] + "</b> times!";
+            
+          return; 
+        }
+        
+      });
+    } catch (error) {
+
+      // set error output 
+      document.getElementById("output").innerHTML =
+          "<b>" + error + "</b>";
+    }
+    
+    output.value = "";
+  }
+
+
+
+    </script>
+  </body>
 </html>
 
