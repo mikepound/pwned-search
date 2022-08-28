@@ -92,7 +92,7 @@ def get_password(length, include_lowercase, include_uppercase, include_number, i
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Generate random password")
-    parser.add_argument("--length", "-l", required=True, type=int, help="Length of password")
+    parser.add_argument("--length", "-l", required=False, type=int, default=15, help="Length of password")
     parser.add_argument("--include_lowercase", "-lc", required=False, type=bool, default=True,
                         help="Include lowercase character in the password")
     parser.add_argument("--include_uppercase", "-uc", required=False, type=bool, default=True,
