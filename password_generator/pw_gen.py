@@ -136,7 +136,7 @@ class PasswordGenerator:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate random password")
-    parser.add_argument("--length", "-l", required=False, type=int, default=50, help="Length of password")
+    parser.add_argument("--length", "-l", required=False, type=int, default=15, help="Length of password")
     parser.add_argument("--include_lowercase", "-lc", required=False, type=str, default='y',
                         help="Include lowercase character in the password")
     parser.add_argument("--include_uppercase", "-uc", required=False, type=str, default='y',
